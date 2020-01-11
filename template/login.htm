@@ -1,0 +1,157 @@
+<!--{template common/header}-->
+<div id="wp" class="wp">
+<div id="wp" class="wp">
+<div id="wp" class="wp">
+<div id="ct" class="ptm wp w cl">
+<div class="nfl" id="main_succeed" style="display: none">
+<div class="f_c altw">
+<div class="alert_right">
+<p id="succeedmessage"></p>
+<p id="succeedlocation" class="alert_btnleft"></p>
+<p class="alert_btnleft"><a id="succeedmessage_href">如果您的浏览器没有自动跳转，请点击此链接</a></p>
+</div>
+</div>
+</div>
+<div class="mn" id="main_message">
+<div class="bm">
+<div class="bm_h bbs">
+
+<h3 class="xs2">bilibili登录</h3>
+</div>
+<div>
+
+<div id="main_messaqge">
+<div id="layer_login">
+<h3 class="flb">
+<em id="returnmessage">
+</em>
+<span></span>
+</h3>
+<form name="bilibili_login" id="bllogin" class="cl" action="{$_G['siteurl']}plugin.php?id=bl_login:login" method="post">
+
+<div class="c cl">
+<div class="rfm">
+<table>
+<tbody><tr>
+<th>
+<label>bilibili帐号:</label></th>
+<td><input type="text" name="username" autocomplete="off" size="30" class="px p_fre" tabindex="1" value="" required></td>
+
+</tr>
+</tbody></table>
+</div>
+<div class="rfm">
+<table>
+<tbody><tr>
+<th><label>密码:</label></th>
+<td><input id="bl_pwd" type="password" name="password"  size="30" class="px p_fre" tabindex="1" value="" required></td>
+<td class="tipcol"><a href=https://passport.bilibili.com/register/findpassword.html#/verify" title="找回密码" target="_blank">找回密码</a></td>
+</tr>
+</tbody></table>
+</div>
+<div class="rfm">
+<table>
+<tbody>
+<tr>
+<th>验证码:</th>
+
+<td><input type="text" name="captcha" autocomplete="off" size="30" class="px p_fre" tabindex="1" value="" pattern="[A-Za-z0-9]{5}" required>
+<br>
+
+<span>
+输入下图中的字符(点击下图刷新) <!--看不清，莎普爱思滴眼睛-->
+<br>
+<img src="{$_G['siteurl']}plugin.php?id=bl_login:captcha" id="captcha_img">
+
+<!--{if $_GET['error'] == 2}-->
+<br>
+ <span style="color:red;">账户或密码错误</span>
+<!--{/if}-->
+</span>
+</td>
+<!--{if $_GET['error'] == 1}-->
+
+<td>
+ <span style="color:red;">验证码错误</span>
+</td>
+<!--{/if}-->
+</tr>
+</tbody></table>
+</div>
+
+
+<div class="rfm mbw bw0">
+<table width="100%">
+<tbody><tr>
+<th>&nbsp;</th>
+<td>
+<!--{if !$_G['uid']}-->
+<button class="pn pnc" type="submit" tabindex="1" id="bl_login"><strong>登录</strong></button>
+<!--{elseif $mid == 0}-->
+<button class="pn pnc" type="submit" tabindex="1" id="bl_login"><strong>绑定</strong></button>
+<!--{/if}-->
+</td>
+<td>
+
+</td>
+</tr>
+</tbody></table>
+</div>
+
+
+<!--{template common/footer}-->
+
+
+
+<script src="https://static.hdslb.com/js/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/jsencrypt/3.0.0-rc.1/jsencrypt.min.js"></script>
+
+
+<script>
+var pu_k;
+var hash ;
+var lock = 0 ;
+var encrypt = new JSEncrypt();
+
+jQuery.noConflict();
+jQuery.ajaxSetup({ async : false }); //同步执行
+jQuery.ajaxSetup({ cache : false })//关闭AJAX相应的缓存 
+function get_key(){
+  jQuery.get("plugin.php?id=bl_login:get_key",function(data){
+          //alert("数据: " + data.hash );
+		  
+	      if (Object.prototype.toString.call(data) === '[object Object]'){
+	         pu_k = data.key ;
+	         hash = data.hash
+	      } else {
+	         alert("登录超时");
+			 window.location.reload();
+	      }
+		  
+  });
+}
+
+jQuery(document).ready(function(){
+
+  jQuery("#captcha_img").click(function(){
+     jQuery("#captcha_img").attr("src","plugin.php?id=bl_login:captcha&rnd=" + Math.random());
+  });
+  
+  jQuery("#bl_login").click(function(){
+     if (lock === 0) {
+         get_key();
+	     encrypt.setPublicKey(pu_k);
+	     if (jQuery("#bl_pwd").attr("value").length != 0 && hash.length != 0){
+             var pwd = encrypt.encrypt(hash + jQuery("#bl_pwd").attr("value"));
+             jQuery("#bl_pwd").attr("value",pwd);
+			 lock = 1 ;
+		   }
+	    }
+   });
+  
+});
+</script>
+
+
+
+
